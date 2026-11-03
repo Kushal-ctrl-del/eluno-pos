@@ -1,35 +1,114 @@
 # Eluno POS
 
-The Must-tier flows are implemented as a Python standard-library modular
-monolith. The core includes customer and prescription validation, cart offers,
-GST, payment/checkout orchestration, full refunds, and read-only Shopify-backed
-day-end reporting.
+The Eluno Retail POS is a Python standard-library modular monolith with a
+dependency-free local web interface. It implements customer and prescription
+validation, cart offers, GST, payment/checkout orchestration, refunds, till
+operations, invoices, audit events, checkout recovery and read-only
+Shopify-backed reporting.
 
-Run the tests and seed validation with:
+## Evaluator setup
 
-```powershell
-& 'C:\Program Files\Python313\python.exe' -m unittest discover -s tests -v
-& 'C:\Program Files\Python313\python.exe' starter-kit\validate_seed.py
+The public repository intentionally does **not** contain the assignment-provided
+`brief/` or `starter-kit/` directories. Obtain those directories separately
+from the original assignment materials; do not copy them from another public
+repository. From the repository root, place them at exactly:
+
+```text
+eluno-pos/
+  app/
+  tests/
+  web/
+  brief/                 # supplied separately; not committed here
+  starter-kit/           # supplied separately; not committed here
 ```
 
-## Local POS frontend
+The commands below require Python 3.9 or newer. The implementation uses only
+the Python standard library; no `pip install` or frontend package manager is
+required. The verification environment used for this project was Python
+3.13.7.
 
-Start the supplied mock services first:
-
-```powershell
-& 'C:\Program Files\Python313\python.exe' starter-kit\mock-apis\mock_server.py --no-flake --port 8787
-```
-
-In another terminal, start the dependency-free POS web application:
+In PowerShell, from the repository root:
 
 ```powershell
-& 'C:\Program Files\Python313\python.exe' -m app.entrypoints.web --host 127.0.0.1 --port 8080
+py -3 --version
+if (-not (Test-Path .\starter-kit\mock-apis\mock_server.py)) {
+    throw "Missing separately supplied starter-kit. Place starter-kit\ at the repository root."
+}
+if (-not (Test-Path .\starter-kit\validate_seed.py)) {
+    throw "Missing starter-kit\validate_seed.py."
+}
 ```
 
-Open <http://127.0.0.1:8080>. The browser shell reads customers, prescriptions,
-products, orders and day-end reports through the local API and delegates
-business decisions to the existing application/adapters. No frontend package
-manager or third-party dependency is required.
+If the Python launcher is unavailable, use the installed interpreter explicitly,
+for example:
+
+```powershell
+& 'C:\Program Files\Python313\python.exe' --version
+```
+
+The equivalent CMD checks are:
+
+```cmd
+py -3 --version
+if not exist starter-kit\mock-apis\mock_server.py echo Missing starter-kit
+if not exist starter-kit\validate_seed.py echo Missing seed validator
+```
+
+## Start the local mock and POS
+
+The supplied deterministic mock server must be running before using the POS.
+In PowerShell terminal 1:
+
+```powershell
+py -3 starter-kit\mock-apis\mock_server.py --no-flake --port 8787
+```
+
+In PowerShell terminal 2:
+
+```powershell
+py -3 -m app.entrypoints.web --host 127.0.0.1 --port 8080
+```
+
+CMD alternatives:
+
+```cmd
+py -3 starter-kit\mock-apis\mock_server.py --no-flake --port 8787
+py -3 -m app.entrypoints.web --host 127.0.0.1 --port 8080
+```
+
+Open <http://127.0.0.1:8080>. The browser shell reads customers,
+prescriptions, products, orders and reports through the local API. Business
+rules remain in the Python application services.
+
+If port 8787 or 8080 is already in use, stop the process using that port or
+choose another port for the corresponding server. The POS adapter defaults
+target the mock on port 8787, so changing the mock port also requires setting
+`ELUNO_SHOPIFY_BASE_URL`, `ELUNO_SMT_BASE_URL` and
+`ELUNO_TERMINAL_BASE_URL` consistently before starting the POS.
+
+## Tests and seed validation
+
+Run the complete test suite from the repository root:
+
+```powershell
+py -3 -m unittest discover -s tests -v
+py -3 -m compileall -q app tests
+node --check web\app.js
+```
+
+Seed validation requires the separately supplied starter kit:
+
+```powershell
+py -3 starter-kit\validate_seed.py
+```
+
+If `starter-kit\validate_seed.py` or its data files are missing, seed
+validation cannot run; this is an external-materials setup issue, not a
+missing application dependency.
+
+The Must-tier and Should-tier flows are implemented against the supplied mock.
+The mock is deterministic only when started with `--no-flake`, and its state is
+in memory. Do not retry an uncertain payment or refund with a new reference.
 
 ### New-sale demo
 
