@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+*.sqlite3
+*.db
+.pytest_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+brief/
+starter-kit/
+eluno_pos.sqlite3

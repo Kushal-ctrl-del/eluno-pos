@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eluno POS</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">E</span><span>eluno <small>POS</small></span></div>
+      <div class="store-context"><span class="eyebrow">CURRENT STORE</span><strong>HSR Layout</strong><span>Staff session · ready</span></div>
+      <nav aria-label="Primary navigation">
+        <button class="nav-item active" data-page="sale"><span>＋</span> New sale</button>
+        <button class="nav-item" data-page="orders"><span>□</span> Orders / refunds</button>
+        <button class="nav-item" data-page="reports"><span>⌁</span> Day-end reports</button>
+        <button class="nav-item" data-page="till"><span>▣</span> Till management</button>
+        <button class="nav-item" data-page="audit"><span>◷</span> Activity</button>
+        <button class="nav-item" data-page="recovery"><span>!</span> Checkout recovery</button>
+      </nav>
+      <div class="sidebar-footer"><span class="status-dot"></span> Services connected</div>
+    </aside>
+    <main class="workspace">
+      <header class="topbar">
+        <div><span class="eyebrow">ELUNO RETAIL SYSTEM</span><h1 id="page-title">New sale</h1></div>
+        <div class="topbar-meta"><span class="session-pill"><span class="status-dot"></span> <span id="till-status">Till checking…</span></span><span class="avatar">S</span><span>Staff S105</span></div>
+      </header>
+      <div id="alerts" class="alerts" aria-live="polite"></div>
+      <section id="sale-page" class="page active">
+        <div class="sale-grid">
+          <div class="primary-column">
+            <section class="panel customer-panel">
+              <div class="panel-heading"><div><span class="step">01</span><h2>Customer & prescription</h2></div><span id="customer-status" class="muted">Search by phone</span></div>
+              <form id="customer-form" class="search-row">
+                <label class="sr-only" for="phone">Customer phone</label><input id="phone" name="phone" placeholder="+91 90000 00005" autocomplete="tel" required>
+                <button class="button button-dark" type="submit">Find customer</button>
+              </form>
+              <div id="customer-result" class="customer-result empty-state">No customer selected. A valid prescription will be loaded with the customer record.</div>
+            </section>
+            <section class="panel catalog-panel">
+              <div class="panel-heading"><div><span class="step">02</span><h2>Select products</h2></div><div class="segmented"><button class="segment active" data-product-type="Frame">Frames</button><button class="segment" data-product-type="Lens">Lenses</button></div></div>
+              <div class="catalog-tools"><input id="catalog-search" placeholder="Search frames and lenses" aria-label="Search catalogue"></div>
+              <div id="catalog" class="product-grid"><div class="loading">Loading catalogue…</div></div>
+            </section>
+          </div>
+          <aside class="cart-panel panel">
+            <div class="cart-heading"><div><span class="eyebrow">CURRENT CART</span><h2>New order</h2></div><span id="cart-count" class="count-badge">0</span></div>
+            <div id="cart-lines" class="cart-lines"><div class="empty-state">Your cart is empty.<br><span>Select a frame to begin.</span></div></div>
+            <div class="cart-summary">
+              <div><span>Subtotal</span><strong id="subtotal">₹0.00</strong></div>
+              <div><span>Discounts</span><strong id="discounts">—</strong></div>
+              <div><span>Taxable value</span><strong id="taxable">—</strong></div>
+              <div><span>CGST · SGST</span><strong id="gst-split">—</strong></div>
+              <div class="total-row"><span>Total payable</span><strong id="total">₹0.00</strong></div>
+            </div>
+            <div class="checkout-fields">
+              <label>Payment method<select id="payment-method"><option value="upi">UPI</option><option value="card">Card</option><option value="cash">Cash</option></select></label>
+              <label>Sales channel<select id="sales-channel"><option value="walk_in">Walk-in</option><option value="whatsapp_booked">WhatsApp booked</option><option value="online_pickup">Online pickup</option></select></label>
+            </div>
+            <button id="checkout-button" class="button button-primary full" disabled>Continue to checkout <span>→</span></button>
+            <p class="cart-note">GST-inclusive pricing. Offers and tax are calculated by the POS services at checkout.</p>
+          </aside>
+        </div>
+      </section>
+      <section id="orders-page" class="page"><div class="page-intro"><span class="eyebrow">ORDER OPERATIONS</span><h2>Orders & refunds</h2><p>Search Shopify orders, inspect financial details and refund selected eligible lines.</p></div><form id="order-search-form" class="inline-form"><input id="order-search" placeholder="Search invoice, order or checkout reference"><button class="button button-dark">Search orders</button></form><div id="orders-list" class="stack-list"></div><div id="order-result" class="panel result-panel empty-state">Select an order to inspect it.</div></section>
+      <section id="reports-page" class="page"><div class="page-intro"><span class="eyebrow">RECONCILIATION</span><h2>Day-end reports</h2><p>Read-only totals from Shopify orders for a selected store and business date.</p></div><form id="report-form" class="inline-form"><input id="report-store" value="HSR" aria-label="Store code" required><input id="report-date" type="date" aria-label="Business date" required><button class="button button-dark">Generate report</button></form><div id="report-result" class="report-grid"></div><div id="report-detail" class="panel result-panel empty-state"></div></section>
+      <section id="till-page" class="page"><div class="page-intro"><span class="eyebrow">CASH CONTROL</span><h2>Till management</h2><p>Open sessions, cash movements and close counts are persisted by the POS.</p></div><div id="till-content" class="till-grid"><div class="panel"><h3>Open session</h3><form id="till-open-form" class="form-stack"><input id="till-float" type="number" placeholder="Opening float (paise)" required><button class="button button-dark">Open till</button></form></div><div class="panel"><h3>Active session</h3><div id="till-session" class="empty-state">No open till session.</div></div></div></section>
+      <section id="audit-page" class="page"><div class="page-intro"><span class="eyebrow">OPERATIONS</span><h2>Activity</h2><p>Append-only POS events from checkout, refunds, till operations and recoveries.</p></div><div id="audit-list" class="panel table-wrap"></div></section>
+      <section id="recovery-page" class="page"><div class="page-intro"><span class="eyebrow">PAYMENT OPERATIONS</span><h2>Checkout recovery</h2><p>Review uncertain payments without creating another charge or Shopify order.</p></div><div id="recovery-list" class="stack-list"><div class="empty-state">Loading recovery cases…</div></div><div id="recovery-detail" class="panel result-panel empty-state">Select a checkout to inspect its recovery state.</div></section>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>
